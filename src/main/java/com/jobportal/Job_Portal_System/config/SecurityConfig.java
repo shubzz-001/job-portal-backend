@@ -17,14 +17,14 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // Disable CSRF for REST APIs
+            // Disabling CSRF for REST APIs
             .csrf(csrf -> csrf.disable())
 
-            // Disable default login mechanisms
+            // Disabling default login mechanisms
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
 
-            // Disable request cache (IMPORTANT)
+            // Disabling request caching
             .requestCache(cache -> cache.disable())
 
             // Authorization rules
@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/auth/signup").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .requestMatchers("/api/health").permitAll()
-                .requestMatchers("/error").permitAll()   // ⭐ THIS IS THE FIX
+                .requestMatchers("/error").permitAll() 
                 .anyRequest().authenticated()
             );
 
