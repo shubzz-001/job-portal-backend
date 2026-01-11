@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jobportal.Job_Portal_System.config.JwtUtil;
 import com.jobportal.Job_Portal_System.dto.LoginRequest;
 import com.jobportal.Job_Portal_System.dto.SignupRequest;
+import com.jobportal.Job_Portal_System.exception.InvalidCredentialsException;
 import com.jobportal.Job_Portal_System.model.Role;
 import com.jobportal.Job_Portal_System.model.User;
 import com.jobportal.Job_Portal_System.repository.UserRepository;
 
+import jakarta.persistence.criteria.CriteriaBuilder.In;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -52,7 +54,7 @@ public class AuthController {
                 .orElseThrow(() -> new RuntimeException("Error: User not found."));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Error: Invalid password.");
+            throw new InvalidCredentialsException("Error: Invalid password or Password.");
         }
 
         String token = jwtUtil.generateToken(user.getEmail());
