@@ -38,4 +38,17 @@ public class UserController {
         return ResponseEntity.ok(userService.getUsersDto(page, size, sortBy));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<Page<UserResponseDto>> searchUsers(
+            @RequestParam(required = false)String name,
+            @RequestParam(required = false)String email,
+            @RequestParam(required = false)String role,
+            @RequestParam(defaultValue = "0")int page,
+            @RequestParam(defaultValue = "5")int size
+    ) {
+        return ResponseEntity.ok(
+            userService.searchUsers(name, email, null, page, size)
+        );
+    }
+
 }
