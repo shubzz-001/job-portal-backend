@@ -6,21 +6,25 @@ import com.jobportal.Job_Portal_System.model.User;
 import com.jobportal.Job_Portal_System.repository.UserRepository;
 import com.jobportal.Job_Portal_System.specification.UserSpecification;
 
-import org.springframework.boot.autoconfigure.rsocket.RSocketProperties.Server.Spec;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+    private final FileStorageService fileStorageService;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, FileStorageService fileStorageService) {
         this.userRepository = userRepository;
+        this.fileStorageService = fileStorageService;
     }
 
     public Page<User> getUsers(int page, int size, String sortBy) {
@@ -54,12 +58,13 @@ public class UserService {
     ) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Specification<User> spec = Specification
-            .where(UserSpecification.hasName(name))
-            .and(UserSpecification.hasEmail(email))
-            .and(UserSpecification.hasRole(role));
+        Specification<User> spec = Specification.allOf(
+            UserSpecification.hasName(name),
+            UserSpecification.hasEmail(email),
+            UserSpecification.hasRole(role)
+        );
 
-        return userRepository.findAll(pageable)
+        return userRepository.findAll(spec, pageable)
             .map(user -> {
                 UserResponseDto dto = new UserResponseDto();
                 dto.setId(user.getId());
@@ -69,5 +74,16 @@ public class UserService {
 
                 return dto;
             });
+    }
+
+    public void uploadProfileImage(Long userId, MultipartFile file) throws IOException {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String filePath = fileStorageService.saveFile(file);
+        user.setProfileToken(filePath);
+
+        userRepository.save(user);
     }
 }

@@ -18,7 +18,6 @@ import com.jobportal.Job_Portal_System.model.Role;
 import com.jobportal.Job_Portal_System.model.User;
 import com.jobportal.Job_Portal_System.repository.UserRepository;
 
-import jakarta.persistence.criteria.CriteriaBuilder.In;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
